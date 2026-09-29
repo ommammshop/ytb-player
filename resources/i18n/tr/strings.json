@@ -6,7 +6,7 @@
     "subscriptions": "Abonelikler",
     "library": "Kitaplık",
     "settings": "Ayarlar",
-    "info_body": "ยูทูปไทย • Version {}\nThai edition by Ommamm\n\nWatch YouTube on the Switch: Thai menus, Thai keyboard, channel search, favorite channels, Shorts, playlists, comments, subtitles and sponsor skipping.\n\nUpdated and maintained by Ommamm.\n\nBased on YTB Player (muratgokce) and Switch-NewPipe (mirusu400) • GPLv3, no warranty • Source: github.com/ommammshop/ytb-player",
+    "info_body": "ยูทูปไทย • Version {}\nThai edition, updated and maintained by Ommamm\n\nYouTube on the Switch with Thai menus, a Thai keyboard,\nchannel search and favorite channels\n\nBased on YTB Player (muratgokce)\nand Switch-NewPipe (mirusu400)\nGPLv3, no warranty • github.com/ommammshop/ytb-player",
     "playback_failed": "Oynatılamadı: {}",
     "notifications": "Bildirimler"
   },
@@ -45,7 +45,11 @@
     "prompt": "Aramak için X'e bas",
     "placeholder": "YouTube'da ara",
     "no_results": "\"{}\" için sonuç yok",
-    "results_count": "\"{}\" • {} sonuç"
+    "results_count": "\"{}\" • {} sonuç",
+    "history_remove": "Remove",
+    "history_clear": "Clear history",
+    "history_clear_confirm": "Clear all recent searches?",
+    "history_cleared": "Cleared recent searches"
   },
   "subscriptions": {
     "filter": {

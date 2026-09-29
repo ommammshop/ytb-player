@@ -30,6 +30,7 @@ private:
     void doSearch(const std::string& query);
     void showQuery();
     void buildHistory();
+    void confirmClearHistory();
     void showStatus(const std::string& text);
     void buildChannels(const std::vector<newpipe::StreamItem>& channels);
     void openChannel(const newpipe::StreamItem& channel);

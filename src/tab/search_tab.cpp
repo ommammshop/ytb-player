@@ -146,7 +146,24 @@ void SearchTab::buildHistory() {
     const auto history = newpipe::LibraryStore::instance().search_history();
     for (size_t i = 0; i < history.size() && i < kHistoryChips; i++) {
         const std::string query = history[i];
-        historyBox->addView(new Chip(clamp_query(query), [this, query]() { doSearch(query); }));
+        auto* chip = new Chip(clamp_query(query), [this, query]() { doSearch(query); });
+        // Y takes this query out of the recent searches.
+        chip->registerAction(newpipe::tr("search/history_remove"), brls::ControllerButton::BUTTON_Y,
+                             [this, query](brls::View*) {
+                                 std::string error;
+                                 newpipe::LibraryStore::instance().remove_search(query, &error);
+                                 // Rebuilt after this action returns: the chip running it goes away.
+                                 ASYNC_RETAIN
+                                 brls::delay(1, [ASYNC_TOKEN]() {
+                                     ASYNC_RELEASE
+                                     buildHistory();
+                                 });
+                                 return true;
+                             });
+        historyBox->addView(chip);
+    }
+    if (!history.empty()) {
+        historyBox->addView(new Chip("✕  " + newpipe::tr("search/history_clear"), [this]() { confirmClearHistory(); }));
     }
     historyBox->setVisibility(history.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
 }
@@ -338,4 +355,18 @@ void SearchTab::openChannel(const newpipe::StreamItem& channel) {
         channel.channel_name,
         [channel](newpipe::YouTubeCatalogService& service) { return service.get_channel_feed(channel); },
         newpipe::tr("detail/channel_load_failed")));
+}
+
+void SearchTab::confirmClearHistory() {
+    auto* dialog = new brls::Dialog(newpipe::tr("search/history_clear_confirm"));
+    // borealis closes a dialog (and gives the focus back) before it runs a button's callback.
+    dialog->addButton(newpipe::tr("hints/cancel"), []() {});
+    dialog->addButton(newpipe::tr("search/history_clear"), [this]() {
+        std::string error;
+        newpipe::LibraryStore::instance().clear_searches(&error);
+        buildHistory();
+        brls::Application::notify(newpipe::tr("search/history_cleared"));
+    });
+    dialog->setCancelable(true);
+    dialog->open();
 }

@@ -56,7 +56,7 @@ TH = {
         "subscriptions": "ช่องที่ติดตาม",
         "library": "คลัง",
         "settings": "ตั้งค่า",
-        "info_body": "ยูทูปไทย • เวอร์ชัน {}\nฉบับภาษาไทยโดยร้าน Ommamm\n\nดู YouTube บน Switch: เมนูภาษาไทย, คีย์บอร์ดไทย, ค้นหาช่อง, ช่องโปรด, Shorts, เพลย์ลิสต์, ความคิดเห็น, คำบรรยาย และข้ามช่วงสปอนเซอร์\n\nอัปเดตและดูแลโดยร้าน Ommamm\n\nพัฒนาต่อจาก YTB Player (muratgokce) และ Switch-NewPipe (mirusu400) • สัญญาอนุญาต GPLv3 ไม่มีการรับประกัน • ซอร์สโค้ด: github.com/ommammshop/ytb-player",
+        "info_body": "ยูทูปไทย • เวอร์ชัน {}\nฉบับภาษาไทย อัปเดตและดูแลโดยร้าน Ommamm\n\nดู YouTube บน Switch พร้อมเมนูไทย คีย์บอร์ดไทย\nค้นหาช่อง และช่องโปรด\n\nพัฒนาต่อจาก YTB Player (muratgokce)\nและ Switch-NewPipe (mirusu400)\nGPLv3 ไม่มีการรับประกัน • github.com/ommammshop/ytb-player",
         "playback_failed": "เล่นไม่สำเร็จ: {}",
         "notifications": "การแจ้งเตือน",
     },
@@ -96,6 +96,10 @@ TH = {
         "placeholder": "ค้นหาใน YouTube",
         "no_results": "ไม่พบผลลัพธ์สำหรับ \"{}\"",
         "results_count": "\"{}\" • {} รายการ",
+        "history_remove": "ลบคำนี้",
+        "history_clear": "ล้างประวัติ",
+        "history_clear_confirm": "ล้างประวัติการค้นหาทั้งหมดใช่ไหม?",
+        "history_cleared": "ล้างประวัติการค้นหาแล้ว",
     },
     "subscriptions": {
         "filter": {

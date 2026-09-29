@@ -32,6 +32,8 @@ public:
     // Recent search queries, newest first, shown under the search box as on YouTube.
     std::vector<std::string> search_history();
     bool add_search(const std::string& query, std::string* error_message = nullptr);
+    bool remove_search(const std::string& query, std::string* error_message = nullptr);
+    bool clear_searches(std::string* error_message = nullptr);
 
     // Favorite channels, kept on the SD card without a Google account; the Subscriptions tab
     // shows their newest videos while signed out. An item carries the channel's id, name, link

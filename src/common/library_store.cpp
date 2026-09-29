@@ -299,6 +299,28 @@ bool LibraryStore::add_search(const std::string& query, std::string* error_messa
     return this->persist(error_message);
 }
 
+bool LibraryStore::remove_search(const std::string& query, std::string* error_message) {
+    if (!this->ensure_loaded(error_message)) {
+        return false;
+    }
+    {
+        std::lock_guard<std::mutex> lock(this->mutex_);
+        this->searches_.erase(std::remove(this->searches_.begin(), this->searches_.end(), query), this->searches_.end());
+    }
+    return this->persist(error_message);
+}
+
+bool LibraryStore::clear_searches(std::string* error_message) {
+    if (!this->ensure_loaded(error_message)) {
+        return false;
+    }
+    {
+        std::lock_guard<std::mutex> lock(this->mutex_);
+        this->searches_.clear();
+    }
+    return this->persist(error_message);
+}
+
 std::vector<StreamItem> LibraryStore::favorite_channels() {
     std::string ignored_error;
     this->ensure_loaded(&ignored_error);
