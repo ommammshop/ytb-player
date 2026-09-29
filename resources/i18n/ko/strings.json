@@ -1,12 +1,12 @@
 {
   "app": {
-    "title": "YTB Player",
+    "title": "ยูทูปไทย",
     "home": "홈",
     "search": "검색",
     "subscriptions": "구독",
     "library": "라이브러리",
     "settings": "설정",
-    "info_body": "YTB Player • 버전 {}\n개발자: muratgokce\n\nSwitch에서 YouTube를 봅니다.\n\nmirusu400의 Switch-NewPipe 기반입니다. GPLv3 라이선스이며 어떠한 보증도 없습니다.",
+    "info_body": "ยูทูปไทย • Version {}\nThai edition by Ommamm\n\nWatch YouTube on the Switch: Thai menus, Thai keyboard, channel search, favorite channels, Shorts, playlists, comments, subtitles and sponsor skipping.\n\nUpdated and maintained by Ommamm.\n\nBased on YTB Player (muratgokce) and Switch-NewPipe (mirusu400) • GPLv3, no warranty • Source: github.com/ommammshop/ytb-player",
     "playback_failed": "재생 실패: {}",
     "notifications": "알림"
   },

@@ -31,6 +31,8 @@ private:
     void showQuery();
     void buildHistory();
     void showStatus(const std::string& text);
+    void buildChannels(const std::vector<newpipe::StreamItem>& channels);
+    void openChannel(const newpipe::StreamItem& channel);
     void setupCard(StreamCard* card, size_t index);
     void updateCount();
     bool allowInitialInput() const;
@@ -42,6 +44,8 @@ private:
     BRLS_BIND(brls::Label, searchText, "search/bar_text");
     BRLS_BIND(brls::Box, historyBox, "search/history");
     BRLS_BIND(brls::Label, statusLabel, "search/status");
+    BRLS_BIND(brls::HScrollingFrame, channelsScroll, "search/channels_scroll");
+    BRLS_BIND(brls::Box, channelsBox, "search/channels");
     BRLS_BIND(brls::ProgressSpinner, spinner, "search/spinner");
     BRLS_BIND(brls::ScrollingFrame, scrollFrame, "search/scroll");
     BRLS_BIND(brls::Box, gridBox, "search/grid");

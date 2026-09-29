@@ -1,8 +1,10 @@
 #include "tab/search_tab.hpp"
 
 #include "activity/stream_detail_activity.hpp"
+#include "activity/stream_feed_activity.hpp"
 #include "activity/thai_keyboard_activity.hpp"
 #include "newpipe/i18n.hpp"
+#include "newpipe/image_loader.hpp"
 #include "newpipe/library_store.hpp"
 #include "newpipe/log.hpp"
 #include "newpipe/playback_helper.hpp"
@@ -20,6 +22,23 @@ constexpr const char* kSavedGridName = "search";
 // Recent searches shown as chips under the box; longer queries are cut.
 constexpr size_t kHistoryChips = 6;
 constexpr size_t kHistoryChipCharacters = 24;
+
+// The channels of the last search, shown again with its results after a video.
+std::vector<newpipe::StreamItem>& last_channels() {
+    static std::vector<newpipe::StreamItem> channels;
+    return channels;
+}
+
+// A name or count cut to fit under a channel's picture.
+std::string clamp_text(const std::string& text, size_t limit) {
+    size_t characters = 0;
+    for (size_t i = 0; i < text.size(); i++) {
+        if ((static_cast<unsigned char>(text[i]) & 0xC0) != 0x80 && characters++ == limit) {
+            return text.substr(0, i) + "…";
+        }
+    }
+    return text;
+}
 
 std::string clamp_query(const std::string& query) {
     size_t characters = 0;
@@ -60,6 +79,7 @@ SearchTab::SearchTab()
         const std::string query = saved.key;
         if (grid_.restoreFrom(saved, query)) {
             lastQuery_ = query;
+            buildChannels(last_channels());
         }
     }
     showQuery();
@@ -151,6 +171,7 @@ void SearchTab::doSearch(const std::string& query) {
     buildHistory();
     newpipe::release_grid_focus(this, gridBox);
     grid_.clear();
+    buildChannels({});
     showStatus({});
     if (spinner) {
         spinner->setVisibility(brls::Visibility::VISIBLE);
@@ -172,10 +193,12 @@ void SearchTab::doSearch(const std::string& query) {
                 spinner->setVisibility(brls::Visibility::GONE);
             }
             newpipe::logf("search: results=%zu", results.items.size());
+            last_channels() = results.channels;
+            buildChannels(results.channels);
             grid_.reset(results.items);
             grid_.setNextPage(results.next_page_token, true,
                               !newpipe::SettingsStore::instance().settings().hide_short_videos);
-            if (grid_.items().empty()) {
+            if (grid_.items().empty() && results.channels.empty()) {
                 showStatus(error.empty() ? newpipe::tr("search/no_results", query) : error);
             } else if (searchBar && brls::Application::getCurrentFocus() == searchBar) {
                 grid_.focusItem(0);  // the keyboard came from the box: go on to the results
@@ -238,4 +261,81 @@ void SearchTab::openStream(const newpipe::StreamItem& item) {
     grid_.saveTo(stream_grid_state::saved(kSavedGridName), lastQuery_);
     stream_grid_state::return_tab() = kSearchTabIndex;
     brls::Application::pushActivity(new StreamDetailActivity(item));
+}
+
+// The channels found, as round pictures above the videos (YouTube's channel results); one
+// opens that channel's page, where it can be added to the favorite channels.
+void SearchTab::buildChannels(const std::vector<newpipe::StreamItem>& channels) {
+    if (!channelsBox || !channelsScroll) {
+        return;
+    }
+    for (brls::View* view = brls::Application::getCurrentFocus(); view; view = view->getParent()) {
+        if (view == channelsBox) {
+            if (searchBar) {
+                brls::Application::giveFocus(searchBar);  // its button is about to go
+            }
+            break;
+        }
+    }
+    channelsBox->clearViews();
+    for (const auto& channel : channels) {
+        auto* entry = new brls::Box(brls::Axis::COLUMN);
+        entry->setFocusable(true);
+        entry->setAlignItems(brls::AlignItems::CENTER);
+        entry->setWidth(132);
+        entry->setPadding(8, 6, 8, 6);
+        entry->setMarginRight(6);
+        entry->setCornerRadius(12);
+        entry->setHighlightCornerRadius(12);
+
+        auto* picture = new brls::Image();
+        picture->setDimensions(76, 76);
+        picture->setCornerRadius(38);
+        picture->setScalingType(brls::ImageScalingType::FILL);
+        picture->setBackgroundColor(nvgRGB(0x27, 0x27, 0x27));
+        if (!channel.channel_avatar_url.empty()) {
+            newpipe::ImageLoader::instance().load(channel.channel_avatar_url, picture);
+        }
+        entry->addView(picture);
+
+        auto* name = new brls::Label();
+        name->setFontSize(14);
+        name->setSingleLine(true);
+        name->setWidth(120);
+        name->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        name->setTextColor(nvgRGB(0xF1, 0xF1, 0xF1));
+        name->setMarginTop(6);
+        name->setText(clamp_text(channel.channel_name, 14));
+        entry->addView(name);
+
+        auto* subscribers = new brls::Label();
+        subscribers->setFontSize(12);
+        subscribers->setSingleLine(true);
+        subscribers->setWidth(120);
+        subscribers->setHorizontalAlign(brls::HorizontalAlign::CENTER);
+        subscribers->setTextColor(nvgRGB(0xAA, 0xAA, 0xAA));
+        subscribers->setText(clamp_text(channel.view_count_text, 18));
+        entry->addView(subscribers);
+
+        const newpipe::StreamItem target = channel;
+        entry->registerClickAction([this, target](brls::View*) {
+            openChannel(target);
+            return true;
+        });
+        entry->addGestureRecognizer(new brls::TapGestureRecognizer(entry));
+        channelsBox->addView(entry);
+    }
+    channelsScroll->setVisibility(channels.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
+}
+
+void SearchTab::openChannel(const newpipe::StreamItem& channel) {
+    if (!allowInitialInput()) {
+        return;
+    }
+    newpipe::logf("search: openChannel id=%s", channel.channel_id.c_str());
+    stream_grid_state::return_tab() = kSearchTabIndex;
+    brls::Application::pushActivity(new StreamFeedActivity(
+        channel.channel_name,
+        [channel](newpipe::YouTubeCatalogService& service) { return service.get_channel_feed(channel); },
+        newpipe::tr("detail/channel_load_failed")));
 }

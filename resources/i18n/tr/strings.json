@@ -1,12 +1,12 @@
 {
   "app": {
-    "title": "YTB Player",
+    "title": "ยูทูปไทย",
     "home": "Ana Sayfa",
     "search": "Ara",
     "subscriptions": "Abonelikler",
     "library": "Kitaplık",
     "settings": "Ayarlar",
-    "info_body": "YTB Player • Sürüm {}\nGeliştirici: muratgokce\n\nYouTube'u Switch'te izlemek için: Shorts, kanallar, listeler, yorumlar, bildirimler, kaldığın yerden devam, otomatik sonraki video, altyazı, sponsor atlama ve ses dengeleme.\n\nmirusu400'ün Switch-NewPipe uygulaması tabanlıdır. GPLv3 ile lisanslıdır; hiçbir garanti verilmez.",
+    "info_body": "ยูทูปไทย • Version {}\nThai edition by Ommamm\n\nWatch YouTube on the Switch: Thai menus, Thai keyboard, channel search, favorite channels, Shorts, playlists, comments, subtitles and sponsor skipping.\n\nUpdated and maintained by Ommamm.\n\nBased on YTB Player (muratgokce) and Switch-NewPipe (mirusu400) • GPLv3, no warranty • Source: github.com/ommammshop/ytb-player",
     "playback_failed": "Oynatılamadı: {}",
     "notifications": "Bildirimler"
   },

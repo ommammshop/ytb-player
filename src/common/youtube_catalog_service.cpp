@@ -1074,6 +1074,63 @@ ChannelInfo parse_channel_header(const json& root) {
     return info;
 }
 
+// A channel in search results: the Android client's compactChannelModel or the web client's
+// channelRenderer.
+std::optional<StreamItem> parse_search_channel(const json& node) {
+    StreamItem channel;
+    if (node.contains("compactChannelModel")) {
+        const json data = node.at("compactChannelModel").value("compactChannelData", json::object());
+        const json browse = data.value("onTap", json::object())
+                                .value("innertubeCommand", json::object())
+                                .value("browseEndpoint", json::object());
+        channel.channel_id = get_string(browse, "browseId");
+        channel.channel_name = get_text(data.value("title", json()));
+        channel.view_count_text = get_text(data.value("subscriberCount", json()));
+        channel.channel_avatar_url =
+            get_thumbnail_url_from_sources(data.value("avatar", json::object()).value("image", json::object()));
+    } else if (node.contains("channelRenderer")) {
+        const json& renderer = node.at("channelRenderer");
+        channel.channel_id = get_string(renderer, "channelId");
+        channel.channel_name = get_text(renderer.value("title", json()));
+        channel.view_count_text = get_text(renderer.value("subscriberCountText", json()));
+        if (channel.view_count_text.empty()) {
+            channel.view_count_text = get_text(renderer.value("videoCountText", json()));
+        }
+        channel.channel_avatar_url = get_thumbnail_url_from_node(renderer.value("thumbnail", json::object()));
+    } else {
+        return std::nullopt;
+    }
+    if (channel.channel_id.rfind("UC", 0) != 0 || channel.channel_name.empty()) {
+        return std::nullopt;
+    }
+    if (channel.channel_avatar_url.rfind("//", 0) == 0) {
+        channel.channel_avatar_url = "https:" + channel.channel_avatar_url;
+    }
+    channel.channel_url = "https://www.youtube.com/channel/" + channel.channel_id;
+    return channel;
+}
+
+void collect_search_channels(const json& node, size_t limit, std::unordered_set<std::string>& seen,
+                             std::vector<StreamItem>& out) {
+    if (out.size() >= limit) {
+        return;
+    }
+    if (node.is_object()) {
+        if (const auto channel = parse_search_channel(node);
+            channel.has_value() && seen.insert(channel->channel_id).second) {
+            out.push_back(*channel);
+            return;
+        }
+        for (const auto& entry : node.items()) {
+            collect_search_channels(entry.value(), limit, seen, out);
+        }
+    } else if (node.is_array()) {
+        for (const auto& entry : node) {
+            collect_search_channels(entry, limit, seen, out);
+        }
+    }
+}
+
 void collect_stream_items(
     const json& node,
     bool allow_short_videos,
@@ -2414,7 +2471,9 @@ SearchResults YouTubeCatalogService::fetch_search_results(
 
     std::unordered_set<std::string> seen_ids;
     collect_stream_items(root, allow_short_videos, limit, seen_ids, results.items);
-    if (results.items.empty()) {
+    std::unordered_set<std::string> seen_channels;
+    collect_search_channels(root, 10, seen_channels, results.channels);
+    if (results.items.empty() && results.channels.empty()) {
         error_message_ = localized("YouTube aramasında sonuç yok", "No YouTube search results");
         return results;
     }
@@ -2422,7 +2481,8 @@ SearchResults YouTubeCatalogService::fetch_search_results(
 
     this->cache_stream_details(results.items);
 
-    logf("youtube: search query=%s items=%zu", query.c_str(), results.items.size());
+    logf("youtube: search query=%s items=%zu channels=%zu", query.c_str(), results.items.size(),
+         results.channels.size());
     return results;
 }
 

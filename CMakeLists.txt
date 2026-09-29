@@ -19,7 +19,7 @@ project(ytb_player
     LANGUAGES C CXX
 )
 
-set(PROJECT_AUTHOR "muratgokce")
+set(PROJECT_AUTHOR "Ommamm")
 # YTB Player 1.1: shown in the homebrew menu (NACP) and in the
 # in-app info dialog.
 set(APP_VERSION_STRING "${PROJECT_VERSION}")
@@ -135,7 +135,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 if (PLATFORM_SWITCH)
     add_custom_target(${APP_FILE_NAME}.nro
         DEPENDS ${PROJECT_NAME}
-        COMMAND ${NX_NACPTOOL_EXE} --create "YTB Player" "${PROJECT_AUTHOR}" "${APP_VERSION_STRING}" ${PROJECT_NAME}.nacp
+        COMMAND ${NX_NACPTOOL_EXE} --create "ยูทูปไทย" "${PROJECT_AUTHOR}" "${APP_VERSION_STRING}" ${PROJECT_NAME}.nacp
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_RESOURCES} ${CMAKE_BINARY_DIR}/resources
         COMMAND ${NX_ELF2NRO_EXE} ${PROJECT_NAME}.elf ${APP_FILE_NAME}.nro
             --icon=${PROJECT_ICON}

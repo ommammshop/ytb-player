@@ -1,12 +1,12 @@
 {
   "app": {
-    "title": "YTB Player",
+    "title": "ยูทูปไทย",
     "home": "หน้าแรก",
     "search": "ค้นหา",
     "subscriptions": "ช่องที่ติดตาม",
     "library": "คลัง",
     "settings": "ตั้งค่า",
-    "info_body": "YTB Player • เวอร์ชัน {}\nผู้พัฒนา: muratgokce\n\nดู YouTube บน Switch: Shorts, ช่อง, เพลย์ลิสต์, ความคิดเห็น, การแจ้งเตือน, ดูต่อจากที่ค้างไว้, เล่นอัตโนมัติ, คำบรรยาย, ข้ามช่วงสปอนเซอร์ และปรับระดับเสียงให้เท่ากัน\n\nพัฒนาต่อจาก Switch-NewPipe ของ mirusu400 ใช้สัญญาอนุญาต GPLv3 ไม่มีการรับประกันใด ๆ",
+    "info_body": "ยูทูปไทย • เวอร์ชัน {}\nฉบับภาษาไทยโดยร้าน Ommamm\n\nดู YouTube บน Switch: เมนูภาษาไทย, คีย์บอร์ดไทย, ค้นหาช่อง, ช่องโปรด, Shorts, เพลย์ลิสต์, ความคิดเห็น, คำบรรยาย และข้ามช่วงสปอนเซอร์\n\nอัปเดตและดูแลโดยร้าน Ommamm\n\nพัฒนาต่อจาก YTB Player (muratgokce) และ Switch-NewPipe (mirusu400) • สัญญาอนุญาต GPLv3 ไม่มีการรับประกัน • ซอร์สโค้ด: github.com/ommammshop/ytb-player",
     "playback_failed": "เล่นไม่สำเร็จ: {}",
     "notifications": "การแจ้งเตือน"
   },

@@ -94,6 +94,9 @@ struct HomeFeed {
 struct SearchResults {
     std::string query;
     std::vector<StreamItem> items;
+    // Channels among the results (YouTube shows them above the videos): channel_id,
+    // channel_name, channel_url, channel_avatar_url, and the subscriber count in view_count_text.
+    std::vector<StreamItem> channels;
     bool used_fallback = false;
     std::string next_page_token;
 };

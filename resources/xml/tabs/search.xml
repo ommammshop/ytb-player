@@ -58,6 +58,21 @@
                 axis="row"
                 marginBottom="14" />
 
+            <!-- Channels among the results, as on YouTube: picture, name, subscribers. -->
+            <brls:HScrollingFrame
+                id="search/channels_scroll"
+                width="auto"
+                height="150"
+                marginBottom="10"
+                visibility="gone">
+
+                <brls:Box
+                    id="search/channels"
+                    width="auto"
+                    height="auto"
+                    axis="row" />
+            </brls:HScrollingFrame>
+
             <brls:Label
                 id="search/status"
                 width="auto"

@@ -1,12 +1,12 @@
 {
   "app": {
-    "title": "YTB Player",
+    "title": "ยูทูปไทย",
     "home": "Home",
     "search": "Search",
     "subscriptions": "Subscriptions",
     "library": "Library",
     "settings": "Settings",
-    "info_body": "YTB Player • Version {}\nDeveloper: muratgokce\n\nWatch YouTube on the Switch: Shorts, channels, playlists, comments, notifications, resume where you left off, autoplay, subtitles, sponsor skipping and loudness levelling.\n\nBased on Switch-NewPipe by mirusu400. Licensed under the GPLv3; comes with no warranty.",
+    "info_body": "ยูทูปไทย • Version {}\nThai edition by Ommamm\n\nWatch YouTube on the Switch: Thai menus, Thai keyboard, channel search, favorite channels, Shorts, playlists, comments, subtitles and sponsor skipping.\n\nUpdated and maintained by Ommamm.\n\nBased on YTB Player (muratgokce) and Switch-NewPipe (mirusu400) • GPLv3, no warranty • Source: github.com/ommammshop/ytb-player",
     "playback_failed": "Playback failed: {}",
     "notifications": "Notifications"
   },
