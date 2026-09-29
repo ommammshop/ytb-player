@@ -170,6 +170,14 @@
                                 lineHeight="1.35"
                                 textColor="#AAAAAA"
                                 marginTop="6" />
+
+                            <!-- Add to / remove from the favorite channels (no account needed). -->
+                            <brls:Box
+                                id="feed/channel_actions"
+                                width="auto"
+                                height="auto"
+                                axis="row"
+                                marginTop="10" />
                         </brls:Box>
                     </brls:Box>
                 </brls:Box>

@@ -46,6 +46,7 @@ struct FeedPreset {
     const char* query_ko;
     bool allow_short_videos = false;
     const char* search_params = "";
+    const char* query_th = nullptr;  // Thai; the English query when unset
 };
 
 // Signed out, "recommended" is a search. Its query brought back almost only Shorts, which are
@@ -53,11 +54,11 @@ struct FeedPreset {
 // "shorts" is a search with the Shorts filter of the web client (get_shorts_feed).
 constexpr std::array<FeedPreset, 5> kFeedPresets = {{
     {"recommended", "Önerilenler", "bugünün popüler videoları", "popular videos today", "오늘의 인기 동영상", false,
-     "EgYIAxABGAM="},
-    {"shorts", "Shorts", "shorts", "shorts", "shorts", true},
-    {"live", "Canlı", "canlı yayın", "live stream", "라이브 방송", true},
-    {"music", "Müzik", "müzik klip", "music video", "뮤직비디오", false},
-    {"gaming", "Oyun", "oyun fragmanı", "game trailer", "게임 트레일러", false},
+     "EgYIAxABGAM=", "วิดีโอยอดนิยมวันนี้"},
+    {"shorts", "Shorts", "shorts", "shorts", "shorts", true, "", "shorts"},
+    {"live", "Canlı", "canlı yayın", "live stream", "라이브 방송", true, "", "ไลฟ์สด"},
+    {"music", "Müzik", "müzik klip", "music video", "뮤직비디오", false, "", "มิวสิควิดีโอ"},
+    {"gaming", "Oyun", "oyun fragmanı", "game trailer", "게임 트레일러", false, "", "ตัวอย่างเกม"},
 }};
 
 const char* preset_query(const FeedPreset& preset) {
@@ -66,6 +67,8 @@ const char* preset_query(const FeedPreset& preset) {
             return preset.query;
         case ContentLanguage::korean:
             return preset.query_ko;
+        case ContentLanguage::thai:
+            return preset.query_th ? preset.query_th : preset.query_en;
         default:
             return preset.query_en;
     }
@@ -421,6 +424,8 @@ std::string format_view_count_text(const std::string& raw_views) {
             return grouped + " görüntüleme";
         case ContentLanguage::korean:
             return "조회수 " + grouped + "회";
+        case ContentLanguage::thai:
+            return "การดู " + grouped + " ครั้ง";
         default:
             return grouped + (raw_views == "1" ? " view" : " views");
     }
@@ -462,10 +467,12 @@ std::string relative_time_text(const std::string& iso) {
         const char* turkish;
         const char* english;
         const char* korean;
+        const char* thai;
     };
     static const Unit units[] = {
-        {31536000, "yıl", "year", "년"}, {2592000, "ay", "month", "개월"}, {604800, "hafta", "week", "주"},
-        {86400, "gün", "day", "일"}, {3600, "saat", "hour", "시간"}, {60, "dakika", "minute", "분"},
+        {31536000, "yıl", "year", "년", "ปี"}, {2592000, "ay", "month", "개월", "เดือน"},
+        {604800, "hafta", "week", "주", "สัปดาห์"}, {86400, "gün", "day", "일", "วัน"},
+        {3600, "saat", "hour", "시간", "ชั่วโมง"}, {60, "dakika", "minute", "분", "นาที"},
     };
     const ContentLanguage language = content_language();
     for (const Unit& unit : units) {
@@ -479,6 +486,8 @@ std::string relative_time_text(const std::string& iso) {
                 return number + " " + unit.turkish + " önce";
             case ContentLanguage::korean:
                 return number + unit.korean + " 전";
+            case ContentLanguage::thai:
+                return number + " " + unit.thai + "ที่แล้ว";
             default:
                 return number + " " + unit.english + (count == 1 ? "" : "s") + " ago";
         }

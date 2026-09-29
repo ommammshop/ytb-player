@@ -110,7 +110,8 @@
         "auto": "System Default",
         "korean": "Korean",
         "english": "English",
-        "turkish": "Turkish"
+        "turkish": "Turkish",
+        "thai": "Thai"
       }
     },
     "playback_quality": {
@@ -408,5 +409,15 @@
     "space": "Space",
     "language": "ไทย/ABC",
     "done": "Search"
+  },
+  "favorite_channels": {
+    "title": "Favorite channels",
+    "action": "Favorite",
+    "add": "Add to favorites",
+    "remove": "In favorites",
+    "added": "Added {} to favorite channels",
+    "removed": "Removed {} from favorite channels",
+    "save_failed": "Could not save favorite channels",
+    "howto": "Favorite channels (no sign-in needed)\n1. Open a channel: press  on a video for its details, then  \"Channel\"\n2. Press \"☆ Add to favorites\" under the channel's name (or )\n3. New videos from all favorite channels show on this tab;  refreshes\nPress the same button again to remove a channel"
   }
 }

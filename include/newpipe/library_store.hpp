@@ -33,6 +33,16 @@ public:
     std::vector<std::string> search_history();
     bool add_search(const std::string& query, std::string* error_message = nullptr);
 
+    // Favorite channels, kept on the SD card without a Google account; the Subscriptions tab
+    // shows their newest videos while signed out. An item carries the channel's id, name, link
+    // and picture.
+    std::vector<StreamItem> favorite_channels();
+    bool is_favorite_channel(const std::string& channel_id);
+    bool toggle_favorite_channel(
+        const StreamItem& channel,
+        bool* is_now_favorite = nullptr,
+        std::string* error_message = nullptr);
+
 private:
     LibraryStore() = default;
 
@@ -44,6 +54,7 @@ private:
     std::vector<StreamItem> history_items_;
     std::vector<StreamItem> favorite_items_;
     std::vector<std::string> searches_;
+    std::vector<StreamItem> favorite_channels_;
 };
 
 }  // namespace newpipe

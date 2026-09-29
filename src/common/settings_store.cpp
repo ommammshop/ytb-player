@@ -52,7 +52,7 @@ std::string sanitize_startup_tab(std::string value) {
 }
 
 std::string sanitize_language(std::string value) {
-    for (const char* allowed : {"auto", "ko", "en-US", "tr"}) {
+    for (const char* allowed : {"auto", "ko", "en-US", "tr", "th"}) {
         if (value == allowed) {
             return value;
         }

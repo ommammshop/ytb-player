@@ -103,7 +103,9 @@ void NotificationsTab::refresh() {
                 const auto& video = results.items[i];
                 newpipe::NotificationItem item;
                 item.text = video.channel_name
-                    + (newpipe::content_language() == newpipe::ContentLanguage::turkish ? " yükledi: " : " uploaded: ")
+                    + (newpipe::content_language() == newpipe::ContentLanguage::turkish ? " yükledi: "
+                   : newpipe::content_language() == newpipe::ContentLanguage::thai  ? " อัปโหลด: "
+                                                                                    : " uploaded: ")
                     + video.title;
                 item.time = video.published_text;
                 item.avatar_url = video.channel_avatar_url;

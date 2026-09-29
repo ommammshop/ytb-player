@@ -193,6 +193,20 @@ void StreamFeedActivity::showChannel(const newpipe::ChannelInfo& channel) {
             channel.description.empty() ? brls::Visibility::GONE : brls::Visibility::VISIBLE);
     }
 
+    if (this->channelActions && !channel.id.empty()) {
+        this->channelActions->clearViews();
+        this->favoriteChip_ = new Chip("", [this]() { this->toggleFavoriteChannel(); });
+        this->channelActions->addView(this->favoriteChip_);
+        this->updateFavoriteChip();
+        if (!this->favoriteActionRegistered_) {
+            this->favoriteActionRegistered_ = true;
+            this->registerAction(newpipe::tr("favorite_channels/action"), brls::BUTTON_X, [this](brls::View*) {
+                this->toggleFavoriteChannel();
+                return true;
+            });
+        }
+    }
+
     if (!this->tabsBox) {
         return;
     }
@@ -499,4 +513,35 @@ void StreamFeedActivity::openPlaylist(const newpipe::StreamItem& item) {
             return feed;
         },
         newpipe::tr("detail/playlist_load_failed")));
+}
+
+// A light chip while the channel is a favorite ("★ ..."), a dark one to add it ("☆ ...").
+void StreamFeedActivity::updateFavoriteChip() {
+    if (!this->favoriteChip_ || !this->channel_) {
+        return;
+    }
+    const bool favorite = newpipe::LibraryStore::instance().is_favorite_channel(this->channel_->id);
+    this->favoriteChip_->setText(favorite ? "★  " + newpipe::tr("favorite_channels/remove")
+                                          : "☆  " + newpipe::tr("favorite_channels/add"));
+    this->favoriteChip_->setLight(favorite);
+}
+
+void StreamFeedActivity::toggleFavoriteChannel() {
+    if (!this->channel_ || this->channel_->id.empty()) {
+        return;
+    }
+    newpipe::StreamItem channel;
+    channel.channel_id = this->channel_->id;
+    channel.channel_name = this->channel_->name.empty() ? this->title_ : this->channel_->name;
+    channel.channel_url = "https://www.youtube.com/channel/" + this->channel_->id;
+    channel.channel_avatar_url = this->channel_->avatar_url;
+    bool now_favorite = false;
+    std::string error;
+    if (!newpipe::LibraryStore::instance().toggle_favorite_channel(channel, &now_favorite, &error)) {
+        brls::Application::notify(error.empty() ? newpipe::tr("favorite_channels/save_failed") : error);
+        return;
+    }
+    brls::Application::notify(newpipe::tr(now_favorite ? "favorite_channels/added" : "favorite_channels/removed",
+                                          channel.channel_name));
+    this->updateFavoriteChip();
 }

@@ -133,12 +133,16 @@ bool LibraryStore::load(std::string* error_message) {
     this->history_items_.clear();
     this->favorite_items_.clear();
     this->searches_.clear();
+    this->favorite_channels_.clear();
 
     for (const auto& node : root.value("history", json::array())) {
         this->history_items_.push_back(deserialize_stream_item(node));
     }
     for (const auto& node : root.value("favorites", json::array())) {
         this->favorite_items_.push_back(deserialize_stream_item(node));
+    }
+    for (const auto& node : root.value("favorite_channels", json::array())) {
+        this->favorite_channels_.push_back(deserialize_stream_item(node));
     }
     for (const auto& node : root.value("searches", json::array())) {
         if (node.is_string()) {
@@ -295,6 +299,57 @@ bool LibraryStore::add_search(const std::string& query, std::string* error_messa
     return this->persist(error_message);
 }
 
+std::vector<StreamItem> LibraryStore::favorite_channels() {
+    std::string ignored_error;
+    this->ensure_loaded(&ignored_error);
+    std::lock_guard<std::mutex> lock(this->mutex_);
+    return this->favorite_channels_;
+}
+
+bool LibraryStore::is_favorite_channel(const std::string& channel_id) {
+    if (channel_id.empty()) {
+        return false;
+    }
+    std::string ignored_error;
+    this->ensure_loaded(&ignored_error);
+    std::lock_guard<std::mutex> lock(this->mutex_);
+    return std::any_of(this->favorite_channels_.begin(), this->favorite_channels_.end(),
+                       [&](const StreamItem& item) { return item.channel_id == channel_id; });
+}
+
+// Added at the front (the newest first), or taken out when it is there already.
+bool LibraryStore::toggle_favorite_channel(
+    const StreamItem& channel,
+    bool* is_now_favorite,
+    std::string* error_message) {
+    if (channel.channel_id.empty()) {
+        if (error_message) {
+            *error_message = "No channel id";
+        }
+        return false;
+    }
+    if (!this->ensure_loaded(error_message)) {
+        return false;
+    }
+    bool now_favorite = false;
+    {
+        std::lock_guard<std::mutex> lock(this->mutex_);
+        auto found = std::find_if(this->favorite_channels_.begin(), this->favorite_channels_.end(),
+                                  [&](const StreamItem& item) { return item.channel_id == channel.channel_id; });
+        if (found != this->favorite_channels_.end()) {
+            this->favorite_channels_.erase(found);
+        } else {
+            this->favorite_channels_.insert(this->favorite_channels_.begin(), channel);
+            now_favorite = true;
+        }
+    }
+    if (is_now_favorite) {
+        *is_now_favorite = now_favorite;
+    }
+    logf("library: favorite channel id=%s now=%d", channel.channel_id.c_str(), now_favorite ? 1 : 0);
+    return this->persist(error_message);
+}
+
 bool LibraryStore::persist(std::string* error_message) {
     json root;
     {
@@ -310,6 +365,11 @@ bool LibraryStore::persist(std::string* error_message) {
         }
 
         root["searches"] = this->searches_;
+
+        root["favorite_channels"] = json::array();
+        for (const auto& item : this->favorite_channels_) {
+            root["favorite_channels"].push_back(serialize_stream_item(item));
+        }
     }
 
     if (!write_text_file(default_library_store_path(), root.dump(2))) {

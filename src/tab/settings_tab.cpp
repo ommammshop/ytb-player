@@ -20,6 +20,9 @@ int language_selection(const std::string& value) {
     if (value == "tr") {
         return 3;
     }
+    if (value == "th") {
+        return 4;
+    }
     return 0;
 }
 
@@ -31,6 +34,8 @@ std::string language_from_selection(int selection) {
             return "en-US";
         case 3:
             return "tr";
+        case 4:
+            return "th";
         default:
             return "auto";
     }
@@ -173,6 +178,7 @@ SettingsTab::SettingsTab() {
             newpipe::tr("settings/language/options/korean"),
             newpipe::tr("settings/language/options/english"),
             newpipe::tr("settings/language/options/turkish"),
+            newpipe::tr("settings/language/options/thai"),
         },
         0,
         [this](int selection) {

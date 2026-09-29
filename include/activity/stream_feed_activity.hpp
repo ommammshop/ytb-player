@@ -48,6 +48,8 @@ private:
     void stepTab(int delta);
     void updateTabs();
     void showMessage(const std::string& text);
+    void toggleFavoriteChannel();
+    void updateFavoriteChip();
 
     std::string title_;
     FeedLoader loader_;
@@ -63,6 +65,8 @@ private:
     // A channel's page: its tabs, the one shown and whether its pages come through
     // get_channel_tab (after a tab was chosen) rather than get_next_page.
     std::optional<newpipe::ChannelInfo> channel_;
+    Chip* favoriteChip_ = nullptr;
+    bool favoriteActionRegistered_ = false;
     std::vector<Chip*> tabChips_;
     size_t tab_ = 0;
     bool tabStepRegistered_ = false;
@@ -84,6 +88,7 @@ private:
     BRLS_BIND(brls::Label, channelMetaLabel, "feed/channel_meta");
     BRLS_BIND(brls::Label, channelDescriptionLabel, "feed/channel_description");
     BRLS_BIND(brls::Box, tabsBox, "feed/tabs");
+    BRLS_BIND(brls::Box, channelActions, "feed/channel_actions");
     BRLS_BIND(brls::Label, messageLabel, "feed/message");
     BRLS_BIND(brls::Box, gridBox, "feed/grid");
     BRLS_BIND(brls::Box, playlistBox, "feed/playlist");

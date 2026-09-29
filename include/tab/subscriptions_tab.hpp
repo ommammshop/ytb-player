@@ -66,6 +66,7 @@ private:
     Filter filter_ = Filter::all;
     std::vector<Chip*> chips_;
     std::string statusTitle_;
+    bool favoritesMode_ = false;  // signed out: the favorite channels' videos
     bool loadRequested_ = false;
     unsigned loadGeneration_ = 0;  // a late feed of an earlier refresh is dropped
     std::atomic<bool> interactionReady_{false};

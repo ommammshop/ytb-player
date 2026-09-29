@@ -1,5 +1,6 @@
 #include "tab/subscriptions_tab.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <unordered_set>
 
@@ -52,6 +53,84 @@ std::string short_name(const std::string& name) {
         }
     }
     return name;
+}
+
+// How long ago a video came out, in seconds, from YouTube's "2 days ago" in any of the app's
+// languages; a very large age when it cannot tell (such videos go last).
+long long published_age_seconds(const std::string& text) {
+    long long number = 0;
+    bool digits = false;
+    for (const char ch : text) {
+        if (ch >= '0' && ch <= '9') {
+            number = number * 10 + (ch - '0');
+            digits = true;
+        } else if (digits) {
+            break;
+        }
+    }
+    if (!digits) {
+        number = 1;
+    }
+    struct Unit {
+        long long seconds;
+        std::vector<const char*> words;
+    };
+    static const std::vector<Unit> units = {
+        {1, {"second", "วินาที", "saniye", "초"}},
+        {60, {"minute", "นาที", "dakika", "분"}},
+        {3600, {"hour", "ชั่วโมง", "saat", "시간"}},
+        {604800, {"week", "สัปดาห์", "hafta", "주"}},
+        {86400, {"day", "วัน", "gün", "일"}},
+        {2592000, {"month", "เดือน", "ay ", "개월"}},
+        {31536000, {"year", "ปี", "yıl", "년"}},
+    };
+    for (const auto& unit : units) {
+        for (const char* word : unit.words) {
+            if (text.find(word) != std::string::npos) {
+                return number * unit.seconds;
+            }
+        }
+    }
+    return 1LL << 40;
+}
+
+// The newest videos of the favorite channels, newest first: each channel's page gives its
+// latest uploads, a few from each.
+std::optional<newpipe::HomeFeed> favorite_channels_feed(newpipe::YouTubeCatalogService& loader,
+                                                        const std::vector<newpipe::StreamItem>& channels) {
+    constexpr size_t kPerChannel = 8;
+    constexpr size_t kMaxChannels = 40;
+    std::vector<std::pair<long long, newpipe::StreamItem>> dated;
+    for (size_t c = 0; c < channels.size() && c < kMaxChannels; c++) {
+        const auto page = loader.get_channel_feed(channels[c]);
+        if (!page.has_value()) {
+            continue;
+        }
+        size_t taken = 0;
+        for (auto item : page->items) {
+            if (item.is_playlist) {
+                continue;
+            }
+            if (item.channel_id.empty()) item.channel_id = channels[c].channel_id;
+            if (item.channel_name.empty()) item.channel_name = channels[c].channel_name;
+            if (item.channel_avatar_url.empty()) item.channel_avatar_url = channels[c].channel_avatar_url;
+            dated.emplace_back(published_age_seconds(item.published_text), item);
+            if (++taken >= kPerChannel) {
+                break;
+            }
+        }
+    }
+    if (dated.empty()) {
+        return std::nullopt;
+    }
+    std::stable_sort(dated.begin(), dated.end(),
+                     [](const auto& a, const auto& b) { return a.first < b.first; });
+    newpipe::HomeFeed feed;
+    feed.kiosk = {"favorite_channels", newpipe::tr("favorite_channels/title")};
+    for (auto& entry : dated) {
+        feed.items.push_back(std::move(entry.second));
+    }
+    return feed;
 }
 
 bool is_short(const newpipe::StreamItem& item) {
@@ -170,10 +249,14 @@ void SubscriptionsTab::refresh() {
         this->clearGrid();
         return;
     }
-    if (!fake && !this->service_.has_auth_session()) {
+    const std::vector<newpipe::StreamItem> favorites =
+        fake || this->service_.has_auth_session() ? std::vector<newpipe::StreamItem>()
+                                                  : newpipe::LibraryStore::instance().favorite_channels();
+    if (!fake && !this->service_.has_auth_session() && favorites.empty()) {
         this->showSignedOutState();
         return;
     }
+    this->favoritesMode_ = !favorites.empty();
 
     SavedStreamGrid& saved = stream_grid_state::saved(kSavedGridName);
     const std::string saved_title = saved.title;
@@ -211,11 +294,13 @@ void SubscriptionsTab::refresh() {
     const unsigned generation = ++this->loadGeneration_;
     const std::string fake_query = fake ? fake_subscriptions() : "";
     ASYNC_RETAIN
-    brls::async([ASYNC_TOKEN, generation, fake_query]() {
+    brls::async([ASYNC_TOKEN, generation, fake_query, favorites]() {
         // Its own service instance: the UI thread never touches this one.
         newpipe::YouTubeCatalogService loader;
         std::optional<newpipe::HomeFeed> feed;
-        if (!fake_query.empty()) {
+        if (!favorites.empty()) {
+            feed = favorite_channels_feed(loader, favorites);
+        } else if (!fake_query.empty()) {
             newpipe::HomeFeed page;
             page.kiosk = {"subscriptions", newpipe::tr("app/subscriptions")};
             page.items = loader.search(fake_query).items;
@@ -407,6 +492,11 @@ void SubscriptionsTab::updateCount() {
 }
 
 void SubscriptionsTab::showSessionBody() {
+    if (this->bodyLabel && this->favoritesMode_) {
+        this->bodyLabel->setText(newpipe::tr("favorite_channels/howto"));
+        this->bodyLabel->setVisibility(this->allItems_.empty() ? brls::Visibility::VISIBLE : brls::Visibility::GONE);
+        return;
+    }
     if (this->bodyLabel) {
         const auto session = this->service_.auth_session();
         std::string session_name;
@@ -455,8 +545,8 @@ void SubscriptionsTab::showSignedOutState() {
     }
     if (this->bodyLabel) {
         this->bodyLabel->setVisibility(brls::Visibility::VISIBLE);
-        const std::string body = newpipe::tr(
-            "subscriptions/signed_out_body", newpipe::default_auth_import_path());
+        const std::string body = newpipe::tr("favorite_channels/howto") + "\n\n"
+            + newpipe::tr("subscriptions/signed_out_body", newpipe::default_auth_import_path());
         this->bodyLabel->setText(body);
     }
 }
