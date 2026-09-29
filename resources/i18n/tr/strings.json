@@ -402,5 +402,11 @@
       "empty": "Gönderilecek bir şey yok: cookies.txt dosyasını seç ya da metni yapıştır.",
       "privacy": "Bu sayfa internetten değil, doğrudan Switch'inden geliyor; çerezler yalnızca ona gider."
     }
+  },
+  "thai_kb": {
+    "delete": "Sil",
+    "space": "Boşluk",
+    "language": "ไทย/ABC",
+    "done": "Ara"
   }
 }

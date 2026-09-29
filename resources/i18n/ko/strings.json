@@ -402,5 +402,11 @@
       "empty": "보낼 내용이 없습니다. cookies.txt를 고르거나 텍스트를 붙여넣으세요.",
       "privacy": "이 페이지는 인터넷이 아니라 Switch에서 바로 열립니다. 쿠키는 Switch로만 전송됩니다."
     }
+  },
+  "thai_kb": {
+    "delete": "지우기",
+    "space": "스페이스",
+    "language": "ไทย/ABC",
+    "done": "검색"
   }
 }

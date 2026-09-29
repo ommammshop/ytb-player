@@ -1,6 +1,7 @@
 #include "tab/search_tab.hpp"
 
 #include "activity/stream_detail_activity.hpp"
+#include "activity/thai_keyboard_activity.hpp"
 #include "newpipe/i18n.hpp"
 #include "newpipe/library_store.hpp"
 #include "newpipe/log.hpp"
@@ -90,12 +91,12 @@ void SearchTab::onCreate() {
 }
 
 void SearchTab::openKeyboard() {
-    brls::Application::getImeManager()->openForText(
+    // The app's own keyboard: the system one has no Thai.
+    brls::Application::pushActivity(new ThaiKeyboardActivity(
         [this](const std::string& text) { doSearch(text); },
         newpipe::tr("search/ime_title"),
-        newpipe::tr("search/ime_subtitle"),
-        80,
-        lastQuery_);
+        lastQuery_,
+        80));
 }
 
 // The box shows the query searched for, or the prompt in gray before the first search.

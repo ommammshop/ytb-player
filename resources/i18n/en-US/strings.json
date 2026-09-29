@@ -402,5 +402,11 @@
       "empty": "Nothing to send: choose cookies.txt or paste the text.",
       "privacy": "This page comes straight from your Switch, not from the internet; the cookies go only to it."
     }
+  },
+  "thai_kb": {
+    "delete": "Delete",
+    "space": "Space",
+    "language": "ไทย/ABC",
+    "done": "Search"
   }
 }
