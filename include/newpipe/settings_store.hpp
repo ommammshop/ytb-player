@@ -8,7 +8,7 @@
 namespace newpipe {
 
 struct AppSettings {
-    std::string language = "auto";
+    std::string language = "th";  // the Thai edition opens in Thai
     std::string startup_tab = "home";
     std::string home_kiosk = "recommended";
     PlaybackQualityMode playback_quality = PlaybackQualityMode::BEST;

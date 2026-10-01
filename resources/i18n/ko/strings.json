@@ -111,7 +111,7 @@
       "save_failed": "언어 저장 실패",
       "saved": "언어를 저장했습니다. 앱을 다시 실행하면 전체에 반영됩니다.",
       "options": {
-        "auto": "시스템 기본값",
+        "auto": "Default (Thai)",
         "korean": "한국어",
         "english": "영어",
         "turkish": "터키어",

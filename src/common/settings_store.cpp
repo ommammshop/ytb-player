@@ -58,7 +58,7 @@ std::string sanitize_language(std::string value) {
         }
     }
 
-    return "auto";
+    return "th";
 }
 
 std::string sanitize_home_kiosk(std::string value) {

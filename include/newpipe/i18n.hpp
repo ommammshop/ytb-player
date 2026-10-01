@@ -16,10 +16,9 @@ inline std::string locale_from_setting(const std::string& language) {
     if (language == "tr") {
         return "tr";  // borealis has no constant for it; resources/i18n/tr is loaded by name
     }
-    if (language == "th") {
-        return "th";  // no borealis constant either; resources/i18n/th is loaded by name
-    }
-    return brls::LOCALE_AUTO;
+    // "th", and "auto" too: the console has no Thai to follow, so the Thai edition's default is
+    // Thai (settings saved before the change say "auto"). No borealis constant: loaded by name.
+    return "th";
 }
 
 template <typename... Args>

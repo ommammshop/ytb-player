@@ -111,7 +111,7 @@
       "save_failed": "Failed to save language",
       "saved": "Language saved. Restart the app to apply it everywhere.",
       "options": {
-        "auto": "System Default",
+        "auto": "Default (Thai)",
         "korean": "Korean",
         "english": "English",
         "turkish": "Turkish",

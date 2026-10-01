@@ -111,7 +111,7 @@
       "save_failed": "Dil kaydedilemedi",
       "saved": "Dil kaydedildi. Her yerde geçerli olması için uygulamayı yeniden başlat.",
       "options": {
-        "auto": "Sistem Varsayılanı",
+        "auto": "Default (Thai)",
         "korean": "Korece",
         "english": "İngilizce",
         "turkish": "Türkçe",
